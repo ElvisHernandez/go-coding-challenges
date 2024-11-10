@@ -17,6 +17,7 @@ func main() {
 
 	printByteCount := flag.Bool("c", false, "Prints the byte count of a file")
 	printLineCount := flag.Bool("l", false, "Prints the line count of a file")
+	printWordCount := flag.Bool("w", false, "Prints the word count of a file")
 	flag.Parse()
 
 	if *printByteCount {
@@ -25,6 +26,10 @@ func main() {
 
 	if *printLineCount {
 		fmt.Printf("%v %v", getLineCount(data), filePath)
+	}
+
+	if *printWordCount {
+		fmt.Printf("%v %v", getWordCount(data), filePath)
 	}
 }
 
@@ -55,4 +60,30 @@ func getLineCount(textData []byte) int {
 	}
 
 	return lines
+}
+
+func getWordCount(textData []byte) int {
+	words := 0
+	text := string(textData)
+	whiteSpaceChars := map[rune]bool{
+		' ':  true,
+		'\t': true,
+		'\r': true,
+		'\n': true,
+		'\v': true,
+		'\f': true,
+	}
+
+	prevChar := ' '
+
+	for _, char := range text {
+		_, prevCharIsWhitespace := whiteSpaceChars[prevChar]
+		_, currCharIsWhitespace := whiteSpaceChars[char]
+		if !prevCharIsWhitespace && currCharIsWhitespace {
+			words += 1
+		}
+		prevChar = char
+	}
+
+	return words
 }
