@@ -18,6 +18,7 @@ func main() {
 	printByteCount := flag.Bool("c", false, "Prints the byte count of a file")
 	printLineCount := flag.Bool("l", false, "Prints the line count of a file")
 	printWordCount := flag.Bool("w", false, "Prints the word count of a file")
+	printCharCount := flag.Bool("m", false, "Prints the character count of a file")
 	flag.Parse()
 
 	if *printByteCount {
@@ -30,6 +31,10 @@ func main() {
 
 	if *printWordCount {
 		fmt.Printf("%v %v", getWordCount(data), filePath)
+	}
+
+	if *printCharCount {
+		fmt.Printf("%v %v", getCharacterCount(data), filePath)
 	}
 }
 
@@ -86,4 +91,17 @@ func getWordCount(textData []byte) int {
 	}
 
 	return words
+}
+
+func getCharacterCount(textData []byte) int {
+	characters := 0
+	text := string(textData)
+
+	// range iterates over each unicode code point as opposed to
+	// len which would give count multi-byte code points as multiple chars
+	for range text {
+		characters += 1
+	}
+
+	return characters
 }
