@@ -3,38 +3,35 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strings"
 )
 
 func main() {
-	filePath := getFilePathArg()
-	data, err := os.ReadFile("./" + filePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	printByteCount := flag.Bool("c", false, "Prints the byte count of a file")
 	printLineCount := flag.Bool("l", false, "Prints the line count of a file")
 	printWordCount := flag.Bool("w", false, "Prints the word count of a file")
 	printCharCount := flag.Bool("m", false, "Prints the character count of a file")
 	flag.Parse()
 
+	textData, filePath := getInputTextData()
+
 	if *printByteCount {
-		fmt.Printf("%v %v\n", len(data), filePath)
+		fmt.Printf("%v %v\n", len(textData), filePath)
 	}
 
 	if *printLineCount {
-		fmt.Printf("%v %v", getLineCount(data), filePath)
+		fmt.Printf("%v %v", getLineCount(textData), filePath)
 	}
 
 	if *printWordCount {
-		fmt.Printf("%v %v", getWordCount(data), filePath)
+		fmt.Printf("%v %v", getWordCount(textData), filePath)
 	}
 
 	if *printCharCount {
-		fmt.Printf("%v %v", getCharacterCount(data), filePath)
+		fmt.Printf("%v %v", getCharacterCount(textData), filePath)
 	}
 
 	// If no flag is passed then print lines, words, and byte counts as default
@@ -42,24 +39,43 @@ func main() {
 		!*printLineCount &&
 		!*printWordCount &&
 		!*printCharCount {
-		fmt.Printf("%v %v %v %v", getLineCount(data), getWordCount(data), len(data), filePath)
+		fmt.Printf("%v %v %v %v", getLineCount(textData), getWordCount(textData), len(textData), filePath)
 	}
 }
 
-func getFilePathArg() string {
+func getInputTextData() ([]byte, string) {
+	filePath, err := getFilePathArg()
+	var textData []byte
+
+	if err == nil {
+		textData, err = os.ReadFile("./" + filePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		textData, err = io.ReadAll(os.Stdin)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	return textData, filePath
+}
+
+func getFilePathArg() (string, error) {
 	args := os.Args[1:]
 
 	if len(args) == 0 {
-		log.Fatal("No arguments were passed")
+		return "", fmt.Errorf("No arguments were passed")
 	}
 
 	filePath := args[len(args)-1]
 
 	if strings.HasPrefix(filePath, "-") {
-		log.Fatal("Last argument must be a file path")
+		return "", fmt.Errorf("Last argument must be a file path")
 	}
 
-	return filePath
+	return filePath, nil
 }
 
 func getLineCount(textData []byte) int {
