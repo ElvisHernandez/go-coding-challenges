@@ -15,11 +15,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	byteCount := flag.Bool("c", false, "Prints the byte count of a file")
+	printByteCount := flag.Bool("c", false, "Prints the byte count of a file")
+	printLineCount := flag.Bool("l", false, "Prints the line count of a file")
 	flag.Parse()
 
-	if *byteCount {
+	if *printByteCount {
 		fmt.Printf("%v %v\n", len(data), filePath)
+	}
+
+	if *printLineCount {
+		fmt.Printf("%v %v", getLineCount(data), filePath)
 	}
 }
 
@@ -37,4 +42,17 @@ func getFilePathArg() string {
 	}
 
 	return filePath
+}
+
+func getLineCount(textData []byte) int {
+	text := string(textData)
+	lines := 0
+
+	for _, char := range text {
+		if char == '\n' {
+			lines += 1
+		}
+	}
+
+	return lines
 }
