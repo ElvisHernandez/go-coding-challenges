@@ -36,6 +36,14 @@ func main() {
 	if *printCharCount {
 		fmt.Printf("%v %v", getCharacterCount(data), filePath)
 	}
+
+	// If no flag is passed then print lines, words, and byte counts as default
+	if !*printByteCount &&
+		!*printLineCount &&
+		!*printWordCount &&
+		!*printCharCount {
+		fmt.Printf("%v %v %v %v", getLineCount(data), getWordCount(data), len(data), filePath)
+	}
 }
 
 func getFilePathArg() string {
